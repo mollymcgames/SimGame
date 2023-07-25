@@ -9,7 +9,8 @@ func _physics_process(delta):
 	#gravity
 	velocity.y += gravity * delta
 	if chase == true:
-		get_node("AnimatedSprite2D").play("Jump")
+		if get_node("AnimatedSprite2D").animation != "Death":		
+			get_node("AnimatedSprite2D").play("Jump")
 		player = get_node("../../Player/Player")
 		var direction = (player.position - self.position).normalized()
 		if direction.x > 0:
@@ -18,7 +19,8 @@ func _physics_process(delta):
 			get_node("AnimatedSprite2D").flip_h = false
 		velocity.x = direction.x * SPEED
 	else:
-		get_node("AnimatedSprite2D").play("Idle")
+		if get_node("AnimatedSprite2D").animation != "Death":
+			get_node("AnimatedSprite2D").play("Idle")
 		velocity.x = 0
 	move_and_slide()
 	
@@ -29,3 +31,10 @@ func _on_player_detection_body_entered(body):
 func _on_player_detection_body_exited(body):
 	if body.name == "Player":
 		chase = false
+
+
+func _on_player_death_body_entered(body):
+	if body.name == "Player":
+		get_node("AnimatedSprite2D").play("Death")
+		await get_node("AnimatedSprite2D").animation_finished
+		self.queue_free()
